@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Exploradora de Pueblos Originarios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Andika:wght@400;700&display=swap">
+<style>
+/* Layout: una sola columna tipo "cuaderno de expedición", franja de aguayo arriba, tarjetas grandes y tocables para una niña de 8 años.
+   Un solo tema claro a propósito (colores de textil andino sobre cielo del altiplano); todos los colores se definen explícitos. */
+:root {
+  --sky: #EAF3FA;
+  --paper: #FFFFFF;
+  --ink: #1E2A44;
+  --ink-soft: #55607A;
+  --line: #D5E1EC;
+  --sun: #FFC53D;
+  --coral: #EE5B4F;
+  --leaf: #23A160;
+  --lake: #2E7BD6;
+  --plum: #7A4FC9;
+  --ok-bg: #E2F6EA;
+  --bad-bg: #FDE7E4;
+  --font-display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Andika", "Verdana", system-ui, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background: var(--sky);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.5;
+}
+.weave {
+  height: 14px;
+  background:
+    repeating-linear-gradient(90deg,
+      var(--coral) 0 18px, var(--sun) 18px 26px, var(--leaf) 26px 44px,
+      var(--sun) 44px 52px, var(--lake) 52px 70px, var(--plum) 70px 78px);
+}
+.weave.thin { height: 8px; border-radius: 4px; }
+.wrap { max-width: 880px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; }
+
+header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; background: none; border: 0; padding: 0; cursor: pointer; color: var(--ink); text-align: left; }
+.brand-mark { width: 44px; height: 44px; border-radius: 12px; background: var(--ink); display: grid; place-items: center; font-size: 26px; }
+.brand b { font-family: var(--font-display); font-size: 22px; line-height: 1.1; display: block; }
+.brand small { color: var(--ink-soft); font-size: 14px; }
+.stars { font-family: var(--font-display); font-size: 20px; background: var(--paper); border: 2px solid var(--line); border-radius: 999px; padding: 4px 16px; display: flex; align-items: center; gap: 6px; }
+.stars .s { color: var(--sun); font-size: 24px; line-height: 1; -webkit-text-stroke: 1px #C9921A; }
+
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(30px, 6vw, 44px); }
+h2 { font-size: 28px; }
+h3 { font-size: 22px; }
+.lead { color: var(--ink-soft); margin: 6px 0 0; max-width: 60ch; }
+.eyebrow { font-family: var(--font-display); font-size: 14px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 6px; }
+
+section { margin-top: 28px; }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.grid.peoples { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+
+.card {
+  background: var(--paper); border: 2px solid var(--line); border-radius: 18px;
+  padding: 16px; text-align: left; color: var(--ink); font: inherit; cursor: pointer;
+  display: flex; flex-direction: column; gap: 6px; min-width: 0;
+  transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.card:hover { transform: translateY(-2px); border-color: var(--ink); box-shadow: 0 4px 0 var(--ink); }
+.card:focus-visible, button:focus-visible { outline: 4px solid var(--lake); outline-offset: 2px; }
+.card .ico { font-size: 40px; line-height: 1; }
+.card .name { font-family: var(--font-display); font-size: 21px; line-height: 1.1; }
+.card .meta { font-size: 15px; color: var(--ink-soft); }
+.card .badge { align-self: flex-start; font-size: 13px; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+.zone-norte { background: #FFF1D6; color: #8A5A00; }
+.zone-centro { background: #E0F5E8; color: #17643C; }
+.zone-sur { background: #E3EEFB; color: #1F5296; }
+.zone-isla { background: #EFE7FB; color: #55309A; }
+.game-card { border-width: 3px; }
+.game-card .done { font-size: 14px; color: var(--leaf); font-weight: 700; }
+
+.hero { display: grid; gap: 18px; grid-template-columns: 1.3fr 1fr; align-items: center; margin-top: 22px; }
+.hero-art { background: var(--paper); border: 2px solid var(--line); border-radius: 22px; padding: 14px; }
+.hero-art svg { width: 100%; height: auto; display: block; }
+@media (max-width: 640px) { .hero { grid-template-columns: 1fr; } }
+
+.btn {
+  font-family: var(--font-display); font-size: 20px; border: 0; border-radius: 14px;
+  padding: 10px 20px; cursor: pointer; background: var(--ink); color: #FFFFFF;
+  box-shadow: 0 4px 0 #0B1222; transition: transform .1s ease;
+}
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #0B1222; }
+.btn.light { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); box-shadow: 0 4px 0 var(--ink); }
+.btn.sun { background: var(--sun); color: var(--ink); box-shadow: 0 4px 0 #C9921A; }
+.btn.small { font-size: 16px; padding: 6px 14px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.back { margin-bottom: 14px; }
+
+/* Ficha */
+.ficha { background: var(--paper); border: 2px solid var(--line); border-radius: 22px; overflow: hidden; }
+.ficha-head { padding: 20px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.ficha-head .big { font-size: 64px; line-height: 1; }
+.ficha-body { padding: 4px 20px 20px; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.dato { border: 2px dashed var(--line); border-radius: 14px; padding: 12px 14px; min-width: 0; }
+.dato .k { font-family: var(--font-display); font-size: 15px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+.dato p { margin: 4px 0 0; }
+.words { padding: 0 20px 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.chip { background: var(--sky); border: 2px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 16px; }
+.chip b { font-family: var(--font-display); }
+
+/* Juegos */
+.panel { background: var(--paper); border: 2px solid var(--line); border-radius: 22px; padding: 20px; }
+.progress { height: 12px; background: var(--sky); border-radius: 999px; overflow: hidden; margin: 10px 0 16px; }
+.progress > i { display: block; height: 100%; background: var(--leaf); border-radius: 999px; transition: width .3s ease; }
+.q { font-family: var(--font-display); font-size: clamp(22px, 4.5vw, 28px); line-height: 1.2; margin: 6px 0 14px; }
+.opts { display: grid; gap: 10px; }
+.opt {
+  font: inherit; font-size: 19px; text-align: left; padding: 12px 16px; border-radius: 14px;
+  border: 2px solid var(--line); background: var(--paper); color: var(--ink); cursor: pointer;
+  display: flex; gap: 12px; align-items: center;
+}
+.opt .l { font-family: var(--font-display); width: 32px; height: 32px; border-radius: 10px; background: var(--sky); display: grid; place-items: center; flex-shrink: 0; }
+.opt:hover:not(:disabled) { border-color: var(--ink); }
+.opt.ok { background: var(--ok-bg); border-color: var(--leaf); }
+.opt.bad { background: var(--bad-bg); border-color: var(--coral); }
+.opt:disabled { cursor: default; }
+.feedback { margin-top: 14px; padding: 12px 16px; border-radius: 14px; display: none; }
+.feedback.show { display: block; }
+.feedback.ok { background: var(--ok-bg); }
+.feedback.bad { background: var(--bad-bg); }
+.feedback b { font-family: var(--font-display); font-size: 20px; }
+.speak { background: var(--sky); border: 2px solid var(--line); color: var(--ink); border-radius: 12px; padding: 4px 12px; font: inherit; font-size: 15px; cursor: pointer; }
+
+/* Unir parejas y clasificar */
+.match { display: grid; grid-template-columns: 1fr 1.6fr; gap: 10px; }
+.match .col { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.tile {
+  font: inherit; font-size: 17px; padding: 10px 12px; border-radius: 14px; border: 2px solid var(--line);
+  background: var(--paper); color: var(--ink); cursor: pointer; text-align: left; min-height: 52px;
+}
+.tile.word { font-family: var(--font-display); font-size: 20px; }
+.tile.sel { border-color: var(--lake); background: #E3EEFB; }
+.tile.ok { border-color: var(--leaf); background: var(--ok-bg); cursor: default; }
+.tile.shake { animation: shake .35s; border-color: var(--coral); }
+@keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+@media (max-width: 520px) { .match { grid-template-columns: 1fr 1.3fr; } .tile { font-size: 15px; } .tile.word { font-size: 17px; } }
+
+.pool { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; min-height: 56px; }
+.bins { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.bin { border: 3px dashed var(--line); border-radius: 18px; padding: 12px; background: var(--paper); font: inherit; color: var(--ink); text-align: left; cursor: pointer; min-height: 120px; display: flex; flex-direction: column; gap: 8px; }
+.bin.ready { border-color: var(--lake); background: #F3F8FE; }
+.bin h3 { font-size: 20px; }
+.bin .hint { font-size: 14px; color: var(--ink-soft); }
+.bin .in { display: flex; flex-wrap: wrap; gap: 6px; }
+.mini { font-size: 15px; background: var(--ok-bg); border: 2px solid var(--leaf); border-radius: 999px; padding: 2px 10px; }
+
+/* Mapa */
+.mapgame { display: grid; grid-template-columns: 1fr 1.1fr; gap: 16px; align-items: start; }
+@media (max-width: 640px) { .mapgame { grid-template-columns: 1fr; } }
+.mapgame svg { width: 100%; height: auto; max-height: 560px; display: block; }
+.zone-hit { cursor: pointer; }
+.zone-hit:focus-visible { outline: none; }
+.zone-hit:focus-visible rect, .zone-hit:focus-visible circle { stroke: var(--lake); stroke-width: 5; }
+
+.celebrate { text-align: center; padding: 28px 16px; }
+.celebrate .big { font-size: 72px; line-height: 1; }
+.celebrate .got { font-family: var(--font-display); font-size: 26px; margin: 10px 0 18px; }
+.foot { margin-top: 36px; font-size: 14px; color: var(--ink-soft); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="weave"></div>
+<div class="wrap">
+  <header class="top">
+    <button class="brand" id="go-home" type="button" aria-label="Volver al inicio">
+      <span class="brand-mark" aria-hidden="true">🧭</span>
+      <span><b>Exploradora de Pueblos</b><small>Ciencias Sociales · 2º básico</small></span>
+    </button>
+    <div class="stars" aria-live="polite"><span class="s" aria-hidden="true">★</span><span id="star-count">0</span> estrellas</div>
+  </header>
+  <main id="app"></main>
+  <p class="foot">Todo el contenido viene de las clases de pueblos originarios: Atacameño, Aymara, Mapuche, Rapa Nui, Selk'nam y Kawésqar.</p>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  Contenido (solo lo que dicen las clases)
+// ─────────────────────────────────────────────
+const PUEBLOS = [
+  { id: 'atacameno', name: 'Atacameño', ico: '🏜️', zone: 'norte', zoneLabel: 'Zona norte', vida: 'Sedentario',
+    otro: 'También se llaman Likanantai.',
+    datos: [
+      ['Ubicación', 'Desierto de Atacama, en la zona norte. Vivían cerca del río Loa y en los oasis del Salar de Atacama, donde había agua dulce.'],
+      ['Forma de vida', 'Sedentarios: vivían en un lugar fijo gracias al agua de los ríos y quebradas.'],
+      ['Vivienda', 'Aldeas con casas de piedra y barro, y fortalezas llamadas pukaras para proteger a sus familias.'],
+      ['Actividades', 'Agricultura en terrazas (maíz, papas y porotos) y crianza de llamas y alpacas.'],
+      ['Sabiduría', 'Vasijas de greda, tejidos de lana de llama, canales de riego y caravanas de llamas para hacer trueque con pueblos vecinos.'],
+    ],
+    palabras: [['Likanantai', 'nombre originario del pueblo atacameño'], ['Pukara', 'fortaleza de piedra'], ['Terrazas', 'escalones en los cerros para cultivar'], ['Trueque', 'intercambiar alimentos']] },
+  { id: 'aymara', name: 'Aymara', ico: '🦙', zone: 'norte', zoneLabel: 'Zona norte', vida: 'Sedentario',
+    otro: 'Viven en el altiplano, una meseta muy alta entre montañas y volcanes.',
+    datos: [
+      ['Ubicación', 'El altiplano de la zona norte. Mañanas muy soleadas y noches muy heladas con vientos fuertes.'],
+      ['Forma de vida', 'Sedentarios: se quedaban en sus poblados todo el año.'],
+      ['Vivienda', 'La uta: paredes de piedras unidas con barro y techo de paja brava.'],
+      ['Actividades', 'Ganadería de llamas y alpacas (carne, transporte y lana) y cultivo en terrazas de papa, quinua y maíz.'],
+      ['Vestimenta', 'Ropa de lana de llama y alpaca: ponchos y mantas de colores, y chullos, gorros que tapan las orejas.'],
+    ],
+    palabras: [['Uta', 'casa aymara'], ['Altiplano', 'meseta muy alta'], ['Chullo', 'gorro tejido que cubre las orejas'], ['Paja brava', 'techo de la casa']] },
+  { id: 'mapuche', name: 'Mapuche', ico: '🌲', zone: 'centro', zoneLabel: 'Zona centro-sur', vida: 'Sedentario',
+    otro: 'Mapuche significa «gente de la tierra» (mapu: tierra, che: gente). Su lengua es el mapudungun.',
+    datos: [
+      ['Ubicación', 'Zona centro-sur: valles verdes, lagos, volcanes y bosques de araucarias.'],
+      ['Forma de vida', 'Sedentarios: vivían de forma fija en sus comunidades.'],
+      ['Vivienda', 'La ruca: postes de madera y techo de paja o coligüe. Al centro, un fogón llamado kutral que daba calor y luz.'],
+      ['Actividades', 'Cultivaban maíz, papas, porotos y calabazas; recolectaban piñones de la araucaria para hacer harina y pan; criaban animales y tejían en el witral.'],
+      ['Cultura', 'Chamal y mantas de lana, la trapelacucha (joya de plata), el kultrún (tambor sagrado) y el palín (juego de bastón y pelota).'],
+    ],
+    palabras: [['Ruca', 'vivienda de madera y paja'], ['Kutral', 'fogón al centro de la ruca'], ['Witral', 'telar para tejer mantas'], ['Kultrún', 'tambor sagrado'], ['Palín', 'juego de bastón y pelota']] },
+  { id: 'rapanui', name: 'Rapa Nui', ico: '🗿', zone: 'isla', zoneLabel: 'Isla en el océano Pacífico', vida: 'Sedentario',
+    otro: 'Su isla está muy lejos del continente, rodeada de agua por todas partes.',
+    datos: [
+      ['Ubicación', 'Rapa Nui (Isla de Pascua), en medio del océano Pacífico.'],
+      ['Forma de vida', 'Sedentarios: vivían en la isla.'],
+      ['Vivienda', 'La hare paenga: casa alargada como un bote al revés, con base de piedras talladas y techo de ramas y pasto seco (totora).'],
+      ['Actividades', 'Pesca de peces, moluscos y atún con anzuelos y canoas, y agricultura de camote, caña de azúcar, ñame y plátanos.'],
+      ['Cultura', 'Los moáis, esculturas gigantes de piedra volcánica en honor a sus antepasados. Bailes, canciones, coronas de plumas y trajes con flores.'],
+    ],
+    palabras: [['Hare paenga', 'casa con forma de bote al revés'], ['Moái', 'escultura de piedra volcánica'], ['Totora', 'pasto seco del techo']] },
+  { id: 'selknam', name: "Selk'nam", ico: '🏹', zone: 'sur', zoneLabel: 'Extremo sur', vida: 'Nómade',
+    otro: 'Eran nómades terrestres: se movían caminando en familias siguiendo a los animales.',
+    datos: [
+      ['Ubicación', 'Isla Grande de Tierra del Fuego, en el extremo sur de Chile.'],
+      ['Forma de vida', 'Nómades terrestres: no tenían pueblos fijos, caminaban de un lugar a otro.'],
+      ['Vivienda', 'Chozas llamadas kawi, de palos y ramas tapadas con cueros de guanaco. Se desarmaban rápido para viajar.'],
+      ['Actividades', 'Cazaban con arco y flecha. El guanaco les daba carne, huesos para herramientas y tendones para coser. Recolectaban calafate y hongos.'],
+      ['Vestimenta y tradiciones', 'Capas de guanaco con la piel hacia afuera, pintura corporal roja, blanca y negra, y la ceremonia del Hain.'],
+    ],
+    palabras: [['Kawi', 'choza de ramas y cueros'], ['Guanaco', 'su animal más importante'], ['Hain', 'ceremonia sagrada de los jóvenes'], ['Calafate', 'fruto silvestre']] },
+  { id: 'kawesqar', name: 'Kawésqar', ico: '🛶', zone: 'sur', zoneLabel: 'Extremo sur', vida: 'Nómade',
+    otro: 'Eran nómades canoeros: vivían gran parte de su vida navegando.',
+    datos: [
+      ['Ubicación', 'Canales e islas del extremo sur, entre el golfo de Penas y el estrecho de Magallanes.'],
+      ['Forma de vida', 'Nómades canoeros: navegaban de isla en isla en su canoa llamada hállefk.'],
+      ['Vivienda', 'Refugios temporales en forma de cúpula, de ramas curvas cubiertas con pieles de lobo marino o cortezas.'],
+      ['Actividades', 'Las mujeres buceaban para sacar cholgas y erizos; cazaban lobos marinos y nutrias con arpones; pescaban desde la canoa; tejían canastos de junquillo.'],
+      ['Vestimenta', 'Capas de piel de lobo marino y grasa animal en la piel para protegerse del agua helada. ¡Llevaban fuego encendido dentro de la canoa!'],
+    ],
+    palabras: [['Hállefk', 'canoa kawésqar'], ['Lobo marino', 'sus pieles para capas y refugios'], ['Junquillo', 'para tejer canastos'], ['Arpón', 'para cazar en el mar']] },
+];
+const P = Object.fromEntries(PUEBLOS.map(p => [p.id, p]));
+
+// Preguntas: [pueblo, pregunta, opciones, índice correcto, explicación]
+const PREGUNTAS = [
+  ['atacameno', '¿Dónde vivía el pueblo atacameño?', ['En el Desierto de Atacama', 'En la selva lluviosa', 'En la costa central', 'En los bosques del sur'], 0, 'Vivían en el Desierto de Atacama, cerca del río Loa y de los oasis.'],
+  ['atacameno', '¿Cuál es el nombre originario del pueblo atacameño?', ['Kawésqar', 'Likanantai', 'Mapudungun', 'Hain'], 1, 'Los atacameños también se llaman Likanantai.'],
+  ['atacameno', '¿Qué es una pukara?', ['Un tambor sagrado', 'Una canoa', 'Una fortaleza de piedra para defender la aldea', 'Un gorro de lana'], 2, 'La pukara es una fortaleza de piedra y barro.'],
+  ['atacameno', '¿Qué son las terrazas?', ['Escalones en los cerros para cultivar', 'Casas en los árboles', 'Barcos de madera', 'Ropa de lana'], 0, 'Hacían escalones de piedra en los cerros para sembrar.'],
+  ['atacameno', '¿Para qué usaban las caravanas de llamas los atacameños?', ['Para ir a la playa', 'Para intercambiar alimentos con pueblos vecinos', 'Para cazar guanacos', 'Para hacer moáis'], 1, 'Viajaban con llamas para hacer trueque de alimentos.'],
+  ['atacameno', '¿Cerca de qué río vivían los atacameños?', ['Río Loa', 'Río Biobío', 'Río Amazonas', 'Río Maipo'], 0, 'Se establecieron cerca del río Loa.'],
+  ['aymara', '¿En qué zona de Chile habita el pueblo Aymara?', ['En los bosques lluviosos del sur', 'En las islas frías del extremo sur', 'En la costa de la zona central', 'En la zona norte, en el altiplano'], 3, 'Los Aymara viven en el altiplano del norte.'],
+  ['aymara', '¿Cómo se llama la casa aymara?', ['Ruca', 'Uta', 'Kawi', 'Hare paenga'], 1, 'La casa aymara se llama uta.'],
+  ['aymara', '¿Con qué hacían el techo de la uta?', ['Con paja brava', 'Con hielo', 'Con hojas de plátano', 'Con pieles de lobo marino'], 0, 'El techo era de paja brava, que los protegía del frío.'],
+  ['aymara', '¿Qué animales criaban los Aymara?', ['Guanacos y lobos marinos', 'Vacas y caballos', 'Llamas y alpacas', 'Nutrias y peces'], 2, 'Criaban llamas y alpacas para carne, transporte y lana.'],
+  ['aymara', '¿Qué es un chullo?', ['Una canoa', 'Un gorro tejido que cubre las orejas', 'Un tambor', 'Una vasija de greda'], 1, 'El chullo es un gorro de lana que tapa las orejas.'],
+  ['aymara', '¿Cómo es el clima del altiplano?', ['Lluvioso todo el día', 'Mañanas soleadas y noches muy heladas', 'Caluroso de día y de noche', 'Siempre nevado'], 1, 'Las mañanas son muy soleadas y las noches muy heladas.'],
+  ['aymara', '¿Qué cultivaban los Aymara en terrazas?', ['Papa, quinua y maíz', 'Plátanos y camote', 'Calafate y hongos', 'Piñones'], 0, 'Cultivaban papa, quinua y maíz.'],
+  ['mapuche', '¿Qué significa la palabra Mapuche?', ['Gente del mar', 'Gente de la tierra', 'Gente del desierto', 'Gente de la isla'], 1, 'Mapu es tierra y che es gente: «gente de la tierra».'],
+  ['mapuche', '¿Cómo se llama la vivienda tradicional mapuche?', ['Ruca', 'Tienda de cuero', 'Iglú', 'Pukara'], 0, 'La vivienda mapuche es la ruca.'],
+  ['mapuche', '¿En qué zona de Chile vivían los mapuche?', ['Zona norte', 'Zona centro-sur', 'Isla de Pascua', 'Extremo sur'], 1, 'Vivían en la zona centro-sur, con bosques de araucarias.'],
+  ['mapuche', '¿Qué es el kultrún?', ['Un telar', 'Una joya de plata', 'Un tambor sagrado', 'Un juego con pelota'], 2, 'El kultrún es un tambor sagrado que representa el universo.'],
+  ['mapuche', '¿Cómo se llama el fogón al centro de la ruca?', ['Kutral', 'Witral', 'Palín', 'Chamal'], 0, 'El kutral daba calor y luz.'],
+  ['mapuche', '¿Qué hacían con los piñones de la araucaria?', ['Collares', 'Harina y panes', 'Techos', 'Pintura'], 1, 'Con los piñones hacían harina y panes.'],
+  ['mapuche', '¿Qué es el palín?', ['Un juego de bastón y pelota', 'Una canoa', 'Una casa', 'Un gorro'], 0, 'El palín es un juego tradicional para compartir en comunidad.'],
+  ['mapuche', '¿Cómo se llama la lengua mapuche?', ['Aymara', 'Mapudungun', 'Rapa Nui', 'Likanantai'], 1, 'Su lengua originaria es el mapudungun.'],
+  ['rapanui', '¿Dónde habita el pueblo Rapa Nui?', ['En el Desierto de Atacama', 'En Tierra del Fuego', 'En Isla de Pascua, en el océano Pacífico', 'En el altiplano'], 2, 'Viven en Rapa Nui (Isla de Pascua), en medio del océano Pacífico.'],
+  ['rapanui', '¿Cómo era la hare paenga?', ['Redonda como una cúpula', 'Alargada como un bote al revés', 'Una fortaleza de piedra', 'Una carpa de cuero'], 1, 'La hare paenga tenía forma de bote invertido.'],
+  ['rapanui', '¿Qué son los moáis?', ['Canoas de madera', 'Esculturas de piedra volcánica en honor a sus antepasados', 'Gorros de plumas', 'Casas de paja'], 1, 'Los moáis son esculturas gigantes de piedra volcánica.'],
+  ['rapanui', '¿A qué se dedicaban los Rapa Nui?', ['A la pesca y la agricultura', 'A cazar guanacos', 'A criar llamas', 'A bucear cholgas en el hielo'], 0, 'Se dedicaban principalmente a la pesca y la agricultura.'],
+  ['rapanui', '¿Qué cultivaban los Rapa Nui?', ['Papa y quinua', 'Camote, caña de azúcar, ñame y plátanos', 'Maíz y porotos', 'Calafate'], 1, 'Cultivaban camotes, caña de azúcar, ñame y plátanos.'],
+  ['selknam', '¿Dónde vivían los Selk\'nam?', ['En la Isla Grande de Tierra del Fuego', 'En el altiplano', 'En Isla de Pascua', 'En el Desierto de Atacama'], 0, 'Vivían en Tierra del Fuego, en el extremo sur.'],
+  ['selknam', '¿Por qué los Selk\'nam eran nómades?', ['Porque vivían en casas de piedra', 'Porque navegaban grandes barcos', 'Porque se trasladaban buscando alimento y caza', 'Porque sembraban maíz'], 2, 'Se movían a pie siguiendo a los animales.'],
+  ['selknam', '¿Cuál era el animal más importante para los Selk\'nam?', ['La llama', 'El guanaco', 'El lobo marino', 'La alpaca'], 1, 'El guanaco les daba carne, huesos, tendones y cueros.'],
+  ['selknam', '¿Cómo se llamaban las chozas Selk\'nam?', ['Uta', 'Ruca', 'Kawi', 'Hare paenga'], 2, 'El kawi era una choza de ramas y cueros de guanaco.'],
+  ['selknam', '¿Qué era el Hain?', ['Una ceremonia donde los jóvenes aprendían de los adultos', 'Un tipo de canoa', 'Una fruta', 'Un tambor'], 0, 'El Hain era una reunión sagrada.'],
+  ['selknam', '¿Con qué cazaban los Selk\'nam?', ['Con arco y flecha', 'Con redes desde canoas', 'Con anzuelos', 'Con trampas de hielo'], 0, 'Eran expertos cazadores con arco y flecha.'],
+  ['selknam', '¿De qué colores era la pintura corporal Selk\'nam?', ['Rojo, blanco y negro', 'Azul y verde', 'Amarillo y morado', 'Dorado'], 0, 'Se pintaban líneas rojas, blancas y negras.'],
+  ['kawesqar', '¿Por qué a los Kawésqar se les llama nómades canoeros?', ['Porque sembraban en jardines', 'Porque hacían casas de piedra', 'Porque viajaban a caballo', 'Porque se trasladaban navegando en canoas por los canales'], 3, 'Navegaban de isla en isla en canoa.'],
+  ['kawesqar', '¿Cómo se llama la canoa kawésqar?', ['Hállefk', 'Kawi', 'Uta', 'Kultrún'], 0, 'Su canoa se llama hállefk.'],
+  ['kawesqar', '¿Qué llevaban siempre dentro de la canoa?', ['Un moái', 'Fuego encendido', 'Llamas', 'Maíz'], 1, '¡Llevaban fuego encendido sobre tierra dentro de la canoa!'],
+  ['kawesqar', '¿De qué eran las capas de los Kawésqar?', ['De lana de alpaca', 'De piel de lobo marino', 'De plumas', 'De algodón'], 1, 'Usaban capas de piel de lobo marino.'],
+  ['kawesqar', '¿Qué sacaban las mujeres kawésqar al bucear?', ['Cholgas y erizos', 'Piedras volcánicas', 'Piñones', 'Papas'], 0, 'Buceaban con canastos para sacar cholgas y erizos.'],
+  ['kawesqar', '¿Para qué se untaban grasa animal en la piel?', ['Para brillar', 'Para aislarse del agua helada y el viento', 'Para pintarse', 'Para cazar'], 1, 'La grasa los protegía del frío y del agua.'],
+  ['general', '¿Qué significa que un pueblo sea sedentario?', ['Que vive siempre en un lugar fijo', 'Que viaja todo el tiempo', 'Que vive en el mar', 'Que no come carne'], 0, 'Sedentario: se queda a vivir en un lugar fijo.'],
+  ['general', '¿Qué significa que un pueblo sea nómade?', ['Que vive siempre en la misma casa', 'Que se traslada de un lugar a otro', 'Que solo come pescado', 'Que vive en la ciudad'], 1, 'Nómade: se mueve de un lugar a otro buscando alimento.'],
+  ['general', 'El pueblo chileno es mestizo. ¿Qué significa?', ['Que tiene raíces de pueblos originarios y del pueblo español', 'Que vino solo de España', 'Que no tiene tradiciones', 'Que vive en una isla'], 0, 'Somos mestizos: mezcla de pueblos originarios y españoles.'],
+  ['general', '¿Dónde podemos ver el mestizaje?', ['En la comida, el lenguaje y las tradiciones', 'Solo en los autos', 'En los planetas', 'En ningún lugar'], 0, 'El mestizaje se ve en la comida, el lenguaje y las tradiciones.'],
+];
+
+const PAREJAS = [
+  { id: 'casas', title: 'Cada pueblo con su casa', intro: 'Une la casa con el pueblo que la construía.', pairs: [
+    ['Uta', 'Pueblo Aymara'], ['Ruca', 'Pueblo Mapuche'], ['Hare paenga', 'Pueblo Rapa Nui'], ['Kawi', "Pueblo Selk'nam"], ['Pukara', 'Pueblo Atacameño'],
+  ] },
+  { id: 'atacameno', title: 'Palabras atacameñas', intro: 'Une cada palabra con lo que significa.', pairs: [
+    ['Terrazas', 'Escalones en los cerros para cultivar'], ['Sedentario', 'Pueblo que vive en un lugar fijo'], ['Pukara', 'Fortaleza de piedra para defender la aldea'], ['Likanantai', 'Nombre originario del pueblo atacameño'],
+  ] },
+  { id: 'mapuche', title: 'Palabras mapuche', intro: 'Une cada palabra con lo que significa.', pairs: [
+    ['Witral', 'Telar de madera donde tejen sus mantas'], ['Kultrún', 'Tambor sagrado con símbolos del universo'], ['Ruca', 'Vivienda tradicional de madera y paja'], ['Mapuche', 'Significa «gente de la tierra»'],
+  ] },
+  { id: 'sur', title: 'Tesoros del sur y de la isla', intro: 'Une cada palabra con lo que significa.', pairs: [
+    ['Hállefk', 'Canoa de los Kawésqar'], ['Hain', "Ceremonia sagrada Selk'nam"], ['Guanaco', "Animal más importante de los Selk'nam"], ['Moái', 'Escultura de piedra volcánica de Rapa Nui'],
+  ] },
+];
+
+// ─────────────────────────────────────────────
+//  Estado y progreso (guardado en este navegador)
+// ─────────────────────────────────────────────
+const KEY = 'exploradora-pueblos-v1';
+let progress = { stars: 0, done: {} };
+try { const raw = localStorage.getItem(KEY); if (raw) progress = { stars: 0, done: {}, ...JSON.parse(raw) }; } catch (e) {}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(progress)); } catch (e) {} }
+function addStars(n) { progress.stars += n; save(); paintStars(); }
+function markDone(id) { progress.done[id] = true; save(); }
+function paintStars() { document.getElementById('star-count').textContent = progress.stars; }
+
+const app = document.getElementById('app');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const shuffle = a => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const zoneClass = z => ({ norte: 'zone-norte', centro: 'zone-centro', sur: 'zone-sur', isla: 'zone-isla' }[z]);
+
+// Leer en voz alta (si el navegador lo permite)
+function speak(text) {
+  try {
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'es-CL'; u.rate = 0.9;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+const speakBtn = (text) => `<button type="button" class="speak" data-say="${esc(text)}">🔊 Escuchar</button>`;
+app.addEventListener('click', e => { const b = e.target.closest('[data-say]'); if (b) speak(b.dataset.say); });
+
+function go(view, arg) {
+  try { speechSynthesis.cancel(); } catch (e) {}
+  VIEWS[view](arg);
+  window.scrollTo({ top: 0 });
+}
+document.getElementById('go-home').addEventListener('click', () => go('home'));
+
+// ─────────────────────────────────────────────
+//  Mapa simplificado de Chile (para inicio y juego)
+// ─────────────────────────────────────────────
+function chileMap({ interactive = false, placed = {} } = {}) {
+  const zones = [
+    { z: 'norte',  label: 'Norte',            x: 150, y: 20,  h: 150, fill: '#FFE3A8' },
+    { z: 'centro', label: 'Centro-sur',       x: 150, y: 180, h: 150, fill: '#BFE8CF' },
+    { z: 'sur',    label: 'Extremo sur',      x: 150, y: 340, h: 150, fill: '#C7DCF6' },
+  ];
+  const tag = (z, x, y) => (placed[z] || []).map((id, i) =>
+    `<text x="${x}" y="${y + i * 30}" font-size="22" font-family="Andika, Verdana, sans-serif" fill="#1E2A44">${P[id].ico} ${esc(P[id].name)}</text>`).join('');
+  const hit = (z, inner) => interactive
+    ? `<g class="zone-hit" data-zone="${z}" tabindex="0" role="button" aria-label="Zona ${z}">${inner}</g>` : `<g>${inner}</g>`;
+  return `
+  <svg viewBox="0 0 420 510" role="img" aria-label="Mapa simple de Chile por zonas y la Isla de Pascua">
+    <rect x="0" y="0" width="420" height="510" rx="18" fill="#DCEBF8"/>
+    <text x="16" y="34" font-size="16" font-family="Baloo 2, sans-serif" fill="#2E7BD6">Océano Pacífico</text>
+    ${zones.map(o => hit(o.z, `
+      <rect x="${o.x}" y="${o.y}" width="70" height="${o.h}" rx="16" fill="${o.fill}" stroke="#1E2A44" stroke-width="2"/>
+      <text x="${o.x + 35}" y="${o.y + o.h / 2 + 6}" text-anchor="middle" font-size="15" font-family="Baloo 2, sans-serif" fill="#1E2A44" transform="rotate(-90 ${o.x + 35} ${o.y + o.h / 2})">${o.label}</text>`)).join('')}
+    ${hit('isla', `
+      <circle cx="60" cy="230" r="34" fill="#E2D5F8" stroke="#1E2A44" stroke-width="2"/>
+      <text x="60" y="236" text-anchor="middle" font-size="22">🏝️</text>
+      <text x="60" y="284" text-anchor="middle" font-size="14" font-family="Baloo 2, sans-serif" fill="#1E2A44">Isla de Pascua</text>`)}
+    <g>${tag('norte', 232, 70)}${tag('centro', 232, 240)}${tag('sur', 232, 400)}${tag('isla', 12, 320)}</g>
+  </svg>`;
+}
+
+// ─────────────────────────────────────────────
+//  Vistas
+// ─────────────────────────────────────────────
+const JUEGOS = [
+  { id: 'quiz',  ico: '❓', name: 'Quiz de los pueblos', desc: '10 preguntas al azar sobre los 6 pueblos.', color: 'var(--coral)' },
+  { id: 'mapa',  ico: '🗺️', name: '¿Dónde vivían?', desc: 'Ubica a cada pueblo en el mapa de Chile.', color: 'var(--lake)' },
+  { id: 'parejas', ico: '🔗', name: 'Une las parejas', desc: 'Une cada palabra con su significado.', color: 'var(--plum)' },
+  { id: 'clasifica', ico: '🧺', name: '¿Nómade o sedentario?', desc: 'Pon a cada pueblo en su canasto.', color: 'var(--leaf)' },
+];
+
+const VIEWS = {
+  home() {
+    app.innerHTML = `
+      <div class="hero">
+        <div>
+          <p class="eyebrow">Pueblos originarios de Chile</p>
+          <h1>¡Hola, exploradora! ¿Lista para el viaje?</h1>
+          <p class="lead">Lee las fichas de cada pueblo y después juega para ganar estrellas. Puedes tocar 🔊 para escuchar.</p>
+          <div class="row" style="margin-top:16px">
+            <button class="btn sun" type="button" data-go="quiz">Empezar el quiz</button>
+            <button class="btn light" type="button" data-go="mapa">Jugar al mapa</button>
+          </div>
+        </div>
+        <div class="hero-art">${chileMap({ placed: { norte: ['atacameno', 'aymara'], centro: ['mapuche'], sur: ['selknam', 'kawesqar'], isla: ['rapanui'] } })}</div>
+      </div>
+
+      <section>
+        <h2>Juegos</h2>
+        <div class="grid" style="margin-top:12px">
+          ${JUEGOS.map(j => `
+            <button class="card game-card" type="button" data-go="${j.id}" style="border-color:${j.color}">
+              <span class="ico" aria-hidden="true">${j.ico}</span>
+              <span class="name">${j.name}</span>
+              <span class="meta">${j.desc}</span>
+              ${progress.done[j.id] ? '<span class="done">✓ Ya lo jugaste</span>' : ''}
+            </button>`).join('')}
+        </div>
+      </section>
+
+      <section>
+        <h2>Fichas de los pueblos</h2>
+        <p class="lead">Toca un pueblo para leer su ficha.</p>
+        <div class="grid peoples" style="margin-top:12px">
+          ${PUEBLOS.map(p => `
+            <button class="card" type="button" data-ficha="${p.id}">
+              <span class="ico" aria-hidden="true">${p.ico}</span>
+              <span class="name">${esc(p.name)}</span>
+              <span class="badge ${zoneClass(p.zone)}">${p.zoneLabel}</span>
+              <span class="meta">${p.vida}</span>
+            </button>`).join('')}
+        </div>
+      </section>`;
+    app.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+    app.querySelectorAll('[data-ficha]').forEach(b => b.onclick = () => go('ficha', b.dataset.ficha));
+  },
+
+  ficha(id) {
+    const p = P[id];
+    const i = PUEBLOS.indexOf(p);
+    const next = PUEBLOS[(i + 1) % PUEBLOS.length];
+    const lectura = `Pueblo ${p.name}. ${p.otro} ` + p.datos.map(([k, v]) => `${k}: ${v}`).join(' ');
+    app.innerHTML = `
+      <button class="btn light small back" type="button" id="b-back">← Volver</button>
+      <article class="ficha">
+        <div class="weave thin"></div>
+        <div class="ficha-head">
+          <span class="big" aria-hidden="true">${p.ico}</span>
+          <div style="min-width:0;flex:1">
+            <p class="eyebrow">Ficha del pueblo</p>
+            <h2>${esc(p.name)}</h2>
+            <div class="row" style="margin-top:6px">
+              <span class="badge chip ${zoneClass(p.zone)}" style="border:0">${p.zoneLabel}</span>
+              <span class="chip"><b>${p.vida}</b></span>
+              ${speakBtn(lectura)}
+            </div>
+            <p class="lead">${esc(p.otro)}</p>
+          </div>
+        </div>
+        <div class="ficha-body">
+          ${p.datos.map(([k, v]) => `<div class="dato"><div class="k">${esc(k)}</div><p>${esc(v)}</p></div>`).join('')}
+        </div>
+        <div class="words">
+          <h3>Palabras para recordar</h3>
+          <div class="chips">${p.palabras.map(([w, d]) => `<span class="chip"><b>${esc(w)}</b>: ${esc(d)}</span>`).join('')}</div>
+        </div>
+      </article>
+      <div class="row" style="margin-top:16px">
+        <button class="btn sun" type="button" id="b-quiz">Preguntas de los ${esc(p.name)}</button>
+        <button class="btn light" type="button" id="b-next">Siguiente: ${next.ico} ${esc(next.name)}</button>
+      </div>`;
+    document.getElementById('b-back').onclick = () => go('home');
+    document.getElementById('b-quiz').onclick = () => go('quiz', id);
+    document.getElementById('b-next').onclick = () => go('ficha', next.id);
+  },
+
+  // ── Quiz ──
+  quiz(puebloId) {
+    const pool = puebloId ? PREGUNTAS.filter(q => q[0] === puebloId) : PREGUNTAS;
+    const qs = shuffle(pool).slice(0, puebloId ? pool.length : 10);
+    let n = 0, good = 0;
+    const title = puebloId ? `Quiz ${P[puebloId].name}` : 'Quiz de los pueblos';
+
+    function render() {
+      if (n >= qs.length) return finish();
+      const [, q, opts, ans, why] = qs[n];
+      const order = shuffle(opts.map((t, i) => ({ t, ok: i === ans })));
+      app.innerHTML = `
+        <button class="btn light small back" type="button" id="b-back">← Salir</button>
+        <div class="panel">
+          <div class="row" style="justify-content:space-between">
+            <p class="eyebrow" style="margin:0">${esc(title)} · Pregunta ${n + 1} de ${qs.length}</p>
+            ${speakBtn(q + ' ' + order.map((o, i) => `${'ABCD'[i]}: ${o.t}.`).join(' '))}
+          </div>
+          <div class="progress"><i style="width:${(n / qs.length) * 100}%"></i></div>
+          <p class="q">${esc(q)}</p>
+          <div class="opts">
+            ${order.map((o, i) => `<button class="opt" type="button" data-ok="${o.ok}"><span class="l">${'ABCD'[i]}</span><span>${esc(o.t)}</span></button>`).join('')}
+          </div>
+          <div class="feedback" id="fb"></div>
+          <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn" type="button" id="b-next" hidden>Siguiente →</button></div>
+        </div>`;
+      document.getElementById('b-back').onclick = () => go(puebloId ? 'ficha' : 'home', puebloId);
+      const fb = document.getElementById('fb');
+      const nextBtn = document.getElementById('b-next');
+      app.querySelectorAll('.opt').forEach(btn => btn.onclick = () => {
+        const ok = btn.dataset.ok === 'true';
+        app.querySelectorAll('.opt').forEach(b => { b.disabled = true; if (b.dataset.ok === 'true') b.classList.add('ok'); });
+        if (!ok) btn.classList.add('bad');
+        if (ok) { good++; addStars(1); }
+        fb.className = 'feedback show ' + (ok ? 'ok' : 'bad');
+        fb.innerHTML = `<b>${ok ? '¡Muy bien! ⭐' : 'Casi…'}</b><br>${esc(why)}`;
+        speak((ok ? '¡Muy bien! ' : 'Casi. ') + why);
+        nextBtn.hidden = false;
+        nextBtn.textContent = n + 1 >= qs.length ? 'Ver resultado' : 'Siguiente →';
+        nextBtn.focus();
+      });
+      nextBtn.onclick = () => { n++; render(); };
+    }
+    function finish() {
+      markDone('quiz');
+      const pct = good / qs.length;
+      app.innerHTML = `
+        <div class="panel celebrate">
+          <div class="big" aria-hidden="true">${pct >= 0.8 ? '🏆' : pct >= 0.5 ? '🌟' : '💪'}</div>
+          <h2>${pct >= 0.8 ? '¡Eres una gran exploradora!' : pct >= 0.5 ? '¡Bien hecho!' : '¡Sigue practicando!'}</h2>
+          <p class="got">Respondiste bien ${good} de ${qs.length} · ganaste ${good} ★</p>
+          <div class="row" style="justify-content:center">
+            <button class="btn sun" type="button" id="b-again">Jugar otra vez</button>
+            <button class="btn light" type="button" id="b-home">Volver al inicio</button>
+          </div>
+        </div>`;
+      document.getElementById('b-again').onclick = () => go('quiz', puebloId);
+      document.getElementById('b-home').onclick = () => go('home');
+    }
+    render();
+  },
+
+  // ── Mapa ──
+  mapa() {
+    const pending = shuffle(PUEBLOS.map(p => p.id));
+    const placed = { norte: [], centro: [], sur: [], isla: [] };
+    let selected = null, mistakes = 0;
+
+    function render(msg = '') {
+      if (!pending.length) return finish();
+      app.innerHTML = `
+        <button class="btn light small back" type="button" id="b-back">← Salir</button>
+        <div class="panel">
+          <p class="eyebrow">¿Dónde vivían?</p>
+          <h2>Elige un pueblo y después toca su zona en el mapa</h2>
+          <div class="mapgame" style="margin-top:14px">
+            <div>
+              <div class="pool">
+                ${pending.map(id => `<button type="button" class="tile word ${selected === id ? 'sel' : ''}" data-p="${id}">${P[id].ico} ${esc(P[id].name)}</button>`).join('')}
+              </div>
+              <p class="lead" id="msg" aria-live="polite">${msg || (selected ? `¿Dónde vivía el pueblo ${esc(P[selected].name)}? Toca el mapa.` : 'Primero toca un pueblo.')}</p>
+            </div>
+            <div>${chileMap({ interactive: true, placed })}</div>
+          </div>
+        </div>`;
+      document.getElementById('b-back').onclick = () => go('home');
+      app.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { selected = b.dataset.p; render(); });
+      app.querySelectorAll('[data-zone]').forEach(z => {
+        const act = () => pick(z.dataset.zone);
+        z.addEventListener('click', act);
+        z.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); act(); } });
+      });
+    }
+    function pick(zone) {
+      if (!selected) return render('Primero toca un pueblo.');
+      const p = P[selected];
+      if (p.zone === zone) {
+        placed[zone].push(selected);
+        pending.splice(pending.indexOf(selected), 1);
+        selected = null;
+        addStars(1);
+        speak('¡Correcto!');
+        render(`¡Correcto! Los ${esc(p.name)} vivían en: ${esc(p.zoneLabel)}. ⭐`);
+      } else {
+        mistakes++;
+        speak('Intenta otra vez');
+        render(`Ups, ahí no. Pista: ${esc(p.datos[0][1])}`);
+      }
+    }
+    function finish() {
+      markDone('mapa');
+      app.innerHTML = `
+        <div class="panel celebrate">
+          <div class="big" aria-hidden="true">🗺️</div>
+          <h2>¡Ubicaste a los 6 pueblos!</h2>
+          <p class="got">${mistakes === 0 ? 'Sin ningún error. ¡Increíble!' : `Con ${mistakes} intento${mistakes > 1 ? 's' : ''} de más.`} Ganaste 6 ★</p>
+          <div style="max-width:420px;margin:0 auto 18px">${chileMap({ placed })}</div>
+          <div class="row" style="justify-content:center">
+            <button class="btn sun" type="button" id="b-again">Jugar otra vez</button>
+            <button class="btn light" type="button" id="b-home">Volver al inicio</button>
+          </div>
+        </div>`;
+      document.getElementById('b-again').onclick = () => go('mapa');
+      document.getElementById('b-home').onclick = () => go('home');
+    }
+    render();
+  },
+
+  // ── Une las parejas ──
+  parejas(setId) {
+    if (!setId) {
+      app.innerHTML = `
+        <button class="btn light small back" type="button" id="b-back">← Volver</button>
+        <h2>Une las parejas</h2>
+        <p class="lead">Elige un grupo de palabras.</p>
+        <div class="grid" style="margin-top:14px">
+          ${PAREJAS.map(s => `<button class="card" type="button" data-set="${s.id}"><span class="name">${esc(s.title)}</span><span class="meta">${s.pairs.length} parejas</span>${progress.done['parejas-' + s.id] ? '<span class="done" style="color:var(--leaf);font-weight:700;font-size:14px">✓ Completado</span>' : ''}</button>`).join('')}
+        </div>`;
+      document.getElementById('b-back').onclick = () => go('home');
+      app.querySelectorAll('[data-set]').forEach(b => b.onclick = () => go('parejas', b.dataset.set));
+      return;
+    }
+    const set = PAREJAS.find(s => s.id === setId);
+    const left = shuffle(set.pairs.map((p, i) => ({ t: p[0], i })));
+    const right = shuffle(set.pairs.map((p, i) => ({ t: p[1], i })));
+    const solved = new Set();
+    let selL = null;
+
+    function render() {
+      app.innerHTML = `
+        <button class="btn light small back" type="button" id="b-back">← Volver</button>
+        <div class="panel">
+          <p class="eyebrow">Une las parejas · ${solved.size} de ${set.pairs.length}</p>
+          <h2>${esc(set.title)}</h2>
+          <p class="lead">${esc(set.intro)} Toca una palabra de la izquierda y luego su pareja.</p>
+          <div class="progress"><i style="width:${(solved.size / set.pairs.length) * 100}%"></i></div>
+          <div class="match">
+            <div class="col">${left.map(o => `<button type="button" class="tile word ${solved.has(o.i) ? 'ok' : ''} ${selL === o.i ? 'sel' : ''}" data-l="${o.i}" ${solved.has(o.i) ? 'disabled' : ''}>${esc(o.t)}</button>`).join('')}</div>
+            <div class="col">${right.map(o => `<button type="button" class="tile ${solved.has(o.i) ? 'ok' : ''}" data-r="${o.i}" ${solved.has(o.i) ? 'disabled' : ''}>${esc(o.t)}</button>`).join('')}</div>
+          </div>
+        </div>`;
+      document.getElementById('b-back').onclick = () => go('parejas');
+      app.querySelectorAll('[data-l]').forEach(b => b.onclick = () => { selL = +b.dataset.l; speak(b.textContent); render(); });
+      app.querySelectorAll('[data-r]').forEach(b => b.onclick = () => {
+        if (selL === null) { speak('Primero toca una palabra de la izquierda'); return; }
+        if (+b.dataset.r === selL) {
+          solved.add(selL); selL = null; addStars(1); speak('¡Muy bien!');
+          if (solved.size === set.pairs.length) return finish();
+          render();
+        } else {
+          b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); speak('Intenta otra vez');
+        }
+      });
+    }
+    function finish() {
+      markDone('parejas'); markDone('parejas-' + set.id);
+      app.innerHTML = `
+        <div class="panel celebrate">
+          <div class="big" aria-hidden="true">🔗</div>
+          <h2>¡Uniste todas las parejas!</h2>
+          <p class="got">Ganaste ${set.pairs.length} ★</p>
+          <div class="row" style="justify-content:center">
+            <button class="btn sun" type="button" id="b-more">Otro grupo de palabras</button>
+            <button class="btn light" type="button" id="b-home">Volver al inicio</button>
+          </div>
+        </div>`;
+      document.getElementById('b-more').onclick = () => go('parejas');
+      document.getElementById('b-home').onclick = () => go('home');
+    }
+    render();
+  },
+
+  // ── Nómade o sedentario ──
+  clasifica() {
+    const pending = shuffle(PUEBLOS.map(p => p.id));
+    const bins = { Sedentario: [], Nómade: [] };
+    let selected = null, msg = 'Toca un pueblo y después el canasto correcto.';
+
+    function render() {
+      if (!pending.length) return finish();
+      app.innerHTML = `
+        <button class="btn light small back" type="button" id="b-back">← Salir</button>
+        <div class="panel">
+          <p class="eyebrow">¿Nómade o sedentario?</p>
+          <h2>Pon a cada pueblo en su canasto</h2>
+          <div class="pool" style="margin-top:14px">
+            ${pending.map(id => `<button type="button" class="tile word ${selected === id ? 'sel' : ''}" data-p="${id}">${P[id].ico} ${esc(P[id].name)}</button>`).join('')}
+          </div>
+          <p class="lead" aria-live="polite" style="margin-bottom:14px">${msg}</p>
+          <div class="bins">
+            <button type="button" class="bin ${selected ? 'ready' : ''}" data-bin="Sedentario">
+              <h3>🏠 Sedentario</h3><span class="hint">Vive en un lugar fijo</span>
+              <span class="in">${bins.Sedentario.map(id => `<span class="mini">${P[id].ico} ${esc(P[id].name)}</span>`).join('')}</span>
+            </button>
+            <button type="button" class="bin ${selected ? 'ready' : ''}" data-bin="Nómade">
+              <h3>🚶 Nómade</h3><span class="hint">Se traslada de un lugar a otro</span>
+              <span class="in">${bins['Nómade'].map(id => `<span class="mini">${P[id].ico} ${esc(P[id].name)}</span>`).join('')}</span>
+            </button>
+          </div>
+        </div>`;
+      document.getElementById('b-back').onclick = () => go('home');
+      app.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { selected = b.dataset.p; msg = `¿El pueblo ${esc(P[selected].name)} era nómade o sedentario?`; render(); });
+      app.querySelectorAll('[data-bin]').forEach(b => b.onclick = () => {
+        if (!selected) { msg = 'Primero toca un pueblo.'; return render(); }
+        const p = P[selected];
+        if (p.vida === b.dataset.bin) {
+          bins[b.dataset.bin].push(selected);
+          pending.splice(pending.indexOf(selected), 1);
+          addStars(1); speak('¡Correcto!');
+          msg = `¡Correcto! ${esc(p.datos[1][1])} ⭐`;
+          selected = null;
+        } else {
+          speak('Intenta otra vez');
+          msg = `Ups, no. Pista: lee dónde vivían los ${esc(p.name)}: ${esc(p.datos[0][1])}`;
+        }
+        render();
+      });
+    }
+    function finish() {
+      markDone('clasifica');
+      app.innerHTML = `
+        <div class="panel celebrate">
+          <div class="big" aria-hidden="true">🧺</div>
+          <h2>¡Canastos completos!</h2>
+          <p class="got">Ganaste 6 ★</p>
+          <p class="lead" style="margin:0 auto 18px">Los Selk'nam eran nómades que caminaban, y los Kawésqar nómades que navegaban en canoa. Los demás vivían en un lugar fijo.</p>
+          <div class="row" style="justify-content:center">
+            <button class="btn sun" type="button" id="b-again">Jugar otra vez</button>
+            <button class="btn light" type="button" id="b-home">Volver al inicio</button>
+          </div>
+        </div>`;
+      document.getElementById('b-again').onclick = () => go('clasifica');
+      document.getElementById('b-home').onclick = () => go('home');
+    }
+    render();
+  },
+};
+
+paintStars();
+go('home');
+</script>
+</body>
+</html>
